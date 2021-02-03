@@ -6,7 +6,7 @@ const getBody = async (url: string) => {
 }
 
 export default (url: string, completion) => {
-    const body = getBody(url)
+    getBody(url)
         .then(body => {
             const zip = new admZip(body);
             const file = zip.getEntries().find(entry => entry.entryName.toLowerCase().endsWith('.xml'));
