@@ -2,29 +2,28 @@ import {logger} from "firebase-functions";
 import AdmZip = require("adm-zip");
 import bent = require("bent");
 
-const getBody = async (url: string) => {
-  return await bent(url);
+const getBuffer = bent("buffer");
+
+const downloadXml = async (url: string): Promise<string> => {
+  const body = await getBuffer(url);
+  logger.debug(`XML Body: ${body}`);
+  if (!body) {
+    const err = new Error("No valid body returned");
+    return Promise.reject(err);
+  }
+
+  const zip = new AdmZip(body);
+  const file = zip.getEntries().find((entry: AdmZip.IZipEntry) =>
+    entry.entryName.toLowerCase().endsWith(".xml"));
+  if (!file) {
+    const err = new Error("No valid xml file found");
+    return Promise.reject(err);
+  }
+
+  const xmlContent = zip.readAsText(file, "utf-8");
+  logger.debug(`Found XML file. file=${file} content=${xmlContent}`);
+
+  return Promise.resolve(xmlContent);
 };
 
-export default (url: string, completion: (res: string | null) => void) => {
-  getBody(url)
-      .then((body) => {
-        logger.debug(`XML Body: ${body}`);
-        const zip = new AdmZip(body);
-        logger.debug(`XML Zip: ${zip}, entries=${zip.getEntries()}`);
-        const file = zip.getEntries().find((entry: AdmZip.IZipEntry) =>
-          entry.entryName.toLowerCase().endsWith(".xml"));
-        logger.debug(`XML files: ${file}`);
-        if (!file) {
-          logger.error("No file found");
-          completion(null);
-          return;
-        }
-
-        completion(zip.readAsText(file, "utf-8"));
-      })
-      .catch((err) => {
-        logger.error(`Error occurred: ${err}`);
-        completion(null);
-      });
-};
+export default downloadXml;
