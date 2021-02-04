@@ -19,6 +19,7 @@
     "@types/bent": "^7.3.2",
     "@types/xml2js": "^0.4.8",
     "adm-zip": "^0.5.2",
+    "arraybuffer-to-buffer": "^0.0.7",
     "bent": "^7.3.12",
     "firebase-admin": "^9.2.0",
     "firebase-functions": "^3.11.0",

@@ -1,8 +1,17 @@
 import {logger} from "firebase-functions";
 import AdmZip = require("adm-zip");
+import arrayBufferToBuffer = require("arraybuffer-to-buffer");
 import bent = require("bent");
 
 const getBuffer = bent("buffer");
+
+const cleanResponse = (input: Buffer | ArrayBuffer) => {
+  if (input instanceof Buffer) {
+    return input;
+  }
+
+  return arrayBufferToBuffer(input);
+};
 
 const downloadXml = async (url: string): Promise<string> => {
   const body = await getBuffer(url);
@@ -12,7 +21,8 @@ const downloadXml = async (url: string): Promise<string> => {
     return Promise.reject(err);
   }
 
-  const zip = new AdmZip(body);
+  const cleanedBody = cleanResponse(body);
+  const zip = new AdmZip(cleanedBody);
   const file = zip.getEntries().find((entry: AdmZip.IZipEntry) =>
     entry.entryName.toLowerCase().endsWith(".xml"));
   if (!file) {
