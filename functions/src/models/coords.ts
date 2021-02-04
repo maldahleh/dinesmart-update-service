@@ -1,4 +1,6 @@
-export default interface Coords {
+interface Coords {
     lat: string,
     lon: string
 }
+
+export default Coords;
