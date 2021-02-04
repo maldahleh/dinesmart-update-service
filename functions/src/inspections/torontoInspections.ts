@@ -5,7 +5,7 @@ import xmlDownloader from '../utils/xmlDownloader';
 const torontoDinesafeUrl = 'http://opendata.toronto.ca/public.health/dinesafe/dinesafe.zip';
 
 export default () => {
-    xmlDownloader(torontoDinesafeUrl, (text: string) => {
+    xmlDownloader(torontoDinesafeUrl, (text: string | null) => {
         if (!text) {
             return;
         }
