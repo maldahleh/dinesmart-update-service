@@ -10,81 +10,81 @@ const targetUrl = "http://opendata.toronto.ca/public.health/dinesafe/dinesafe.zi
 const updateTorontoInspections = async (): Promise<boolean> => {
   logger.info(`Attempting to download file: ${targetUrl}`);
 
-  return await xmlDownloader(targetUrl)
-      .then((res) => {
-        logger.debug("Downloaded xml, parsing string");
-        return parseStringPromise(res);
-      })
-      .then((xmlString) => {
-        logger.debug(`XML string parsed. obj=${xmlString}`);
-        const inspections: Record<string, Location> = {};
-        const rows = xmlString["ROWDATA"]["ROW"];
-        rows.forEach((res: TorontoInspectionResponse) => {
-          let existingData = inspections[res["ESTABLISHMENT_ID"][0]];
-          if (typeof existingData === "undefined") {
-            existingData = {
-              "name": res["ESTABLISHMENT_NAME"][0].trim(),
-              "type": res["ESTABLISHMENTTYPE"][0],
-              "address": res["ESTABLISHMENT_ADDRESS"][0].trim(),
-              "coords": {
-                "lat": res["LATITUDE"][0],
-                "lon": res["LONGITUDE"][0],
-              },
-              "inspectionMap": {
-              },
-              "inspections": [],
-            };
-          }
+  const xml = await xmlDownloader(targetUrl).catch((err) => {
+    throw err;
+  });
 
-          const inspectionMap = existingData["inspectionMap"];
-          let inspectionData = inspectionMap[res["INSPECTION_ID"][0]];
-          if (typeof inspectionData === "undefined") {
-            inspectionData = {
-              "date": res["INSPECTION_DATE"][0],
-              "status": res["ESTABLISHMENT_STATUS"][0],
-              "infractions": [],
-            };
-          }
+  const xmlObject = await parseStringPromise(xml).catch((err) => {
+    throw err;
+  });
 
-          const infractionDetails = res["INFRACTION_DETAILS"][0];
-          if (infractionDetails !== "") {
-            let severity = res["SEVERITY"][0];
-            if (severity.startsWith("NA")) {
-              severity = severity.substring(5);
-            } else {
-              severity = severity.substring(4);
-            }
+  logger.info(`XML string parsed. obj=${xmlObject}`);
+  const inspections: Record<string, Location> = {};
+  const rows = xmlObject["ROWDATA"]["ROW"];
+  rows.forEach((res: TorontoInspectionResponse) => {
+    let existingData = inspections[res["ESTABLISHMENT_ID"][0]];
+    if (typeof existingData === "undefined") {
+      existingData = {
+        "name": res["ESTABLISHMENT_NAME"][0].trim(),
+        "type": res["ESTABLISHMENTTYPE"][0],
+        "address": res["ESTABLISHMENT_ADDRESS"][0].trim(),
+        "coords": {
+          "lat": res["LATITUDE"][0],
+          "lon": res["LONGITUDE"][0],
+        },
+        "inspectionMap": {
+        },
+        "inspections": [],
+      };
+    }
 
-            inspectionData["infractions"].push({
-              "details": infractionDetails,
-              "severity": severity,
-            });
-          }
+    const inspectionMap = existingData["inspectionMap"];
+    let inspectionData = inspectionMap[res["INSPECTION_ID"][0]];
+    if (typeof inspectionData === "undefined") {
+      inspectionData = {
+        "date": res["INSPECTION_DATE"][0],
+        "status": res["ESTABLISHMENT_STATUS"][0],
+        "infractions": [],
+      };
+    }
 
-          inspectionMap[res["INSPECTION_ID"][0]] = inspectionData;
-          inspections[res["ESTABLISHMENT_ID"][0]] = existingData;
-        });
+    const infractionDetails = res["INFRACTION_DETAILS"][0];
+    if (infractionDetails !== "") {
+      let severity = res["SEVERITY"][0];
+      if (severity.startsWith("NA")) {
+        severity = severity.substring(5);
+      } else {
+        severity = severity.substring(4);
+      }
 
-        Object.keys(inspections).forEach((inspection) => {
-          const inspectionArray = Object.values(
-              inspections[inspection]["inspectionMap"]
-          );
+      inspectionData["infractions"].push({
+        "details": infractionDetails,
+        "severity": severity,
+      });
+    }
 
-          inspectionArray.sort((a, b) => (b["date"] > a["date"]) ? 1 :
+    inspectionMap[res["INSPECTION_ID"][0]] = inspectionData;
+    inspections[res["ESTABLISHMENT_ID"][0]] = existingData;
+  });
+
+  Object.keys(inspections).forEach(async (inspection) => {
+    const inspectionArray = Object.values(
+        inspections[inspection]["inspectionMap"]
+    );
+
+    inspectionArray.sort((a, b) => (b["date"] > a["date"]) ? 1 :
                     ((a["date"] > b["date"]) ? -1 : 0));
 
-          inspections[inspection]["inspections"] = inspectionArray;
-          inspections[inspection]["inspectionMap"] = {};
+    inspections[inspection]["inspections"] = inspectionArray;
+    inspections[inspection]["inspectionMap"] = {};
 
-          const location = inspections[inspection];
-          addToStorage(inspection, location);
-        });
+    const location = inspections[inspection];
+    await addToStorage(inspection, location).catch((err) => {
+      logger.error(`Error writing to DB: ${err}`);
+    });
+  });
 
-        return Promise.resolve(true);
-      })
-      .catch((err) => {
-        throw err;
-      });
+  return Promise.resolve(true);
 };
 
 export default updateTorontoInspections;
