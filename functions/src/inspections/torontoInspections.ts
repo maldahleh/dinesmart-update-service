@@ -12,9 +12,11 @@ const updateTorontoInspections = async (): Promise<boolean> => {
 
   return await xmlDownloader(targetUrl)
       .then((res) => {
+        logger.debug("Downloaded xml, parsing string");
         return parseStringPromise(res);
       })
       .then((xmlString) => {
+        logger.debug(`XML string parsed. obj=${xmlString}`);
         const inspections: Record<string, Location> = {};
         const rows = xmlString["ROWDATA"]["ROW"];
         rows.forEach((res: TorontoInspectionResponse) => {

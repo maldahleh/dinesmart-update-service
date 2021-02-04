@@ -15,8 +15,7 @@ const cleanResponse = (input: Buffer | ArrayBuffer) => {
 
 const downloadXml = async (url: string): Promise<string> => {
   const body = await getBuffer(url);
-  logger.debug(`XML Body: ${body}`);
-  if (!body) {
+  if (body === undefined) {
     const err = new Error("No valid body returned");
     return Promise.reject(err);
   }
@@ -25,7 +24,7 @@ const downloadXml = async (url: string): Promise<string> => {
   const zip = new AdmZip(cleanedBody);
   const file = zip.getEntries().find((entry: AdmZip.IZipEntry) =>
     entry.entryName.toLowerCase().endsWith(".xml"));
-  if (!file) {
+  if (file === undefined) {
     const err = new Error("No valid xml file found");
     return Promise.reject(err);
   }
