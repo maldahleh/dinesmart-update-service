@@ -1,4 +1,5 @@
 import {Firestore} from "@google-cloud/firestore";
+import Location from "../models/location";
 
 const firestore = new Firestore();
 

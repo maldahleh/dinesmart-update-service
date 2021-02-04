@@ -74,7 +74,8 @@ const updateTorontoInspections = async (): Promise<boolean> => {
           inspections[inspection]["inspections"] = inspectionArray;
           inspections[inspection]["inspectionMap"] = {};
 
-          addToStorage(inspection, inspections[inspection]);
+          const location = inspections[inspection];
+          addToStorage(inspection, location);
         });
 
         return Promise.resolve(true);
