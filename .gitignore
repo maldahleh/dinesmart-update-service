@@ -1,1 +1,4 @@
 .DS_Store
+
+# Ignore cloud access key
+DineSmart-a5a9a082d13d.json
