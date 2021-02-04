@@ -1,4 +1,5 @@
 import { parseString } from 'xml2js';
+import Location from '../models/location';
 import addToStorage from '../storage/storageService';
 import xmlDownloader from '../utils/xmlDownloader';
 
@@ -15,7 +16,7 @@ export default () => {
                 return;
             }
 
-            const inspections = {};
+            const inspections: Record<string, Location> = {};
             result['ROWDATA']['ROW'].forEach(res => {
                 let existingData = inspections[res['ESTABLISHMENT_ID'][0]];
                 if (typeof existingData === 'undefined') {
