@@ -2,6 +2,7 @@ import { parseString } from 'xml2js';
 import Location from '../models/location';
 import addToStorage from '../storage/storageService';
 import xmlDownloader from '../utils/xmlDownloader';
+import TorontoInspectionResponse from './models/torontoInspectionResponse';
 
 const torontoDinesafeUrl = 'http://opendata.toronto.ca/public.health/dinesafe/dinesafe.zip';
 
@@ -17,7 +18,7 @@ export default () => {
             }
 
             const inspections: Record<string, Location> = {};
-            result['ROWDATA']['ROW'].forEach(res => {
+            result['ROWDATA']['ROW'].forEach((res: TorontoInspectionResponse) => {
                 let existingData = inspections[res['ESTABLISHMENT_ID'][0]];
                 if (typeof existingData === 'undefined') {
                     existingData = {
@@ -28,12 +29,13 @@ export default () => {
                             'lat': res['LATITUDE'][0],
                             'lon': res['LONGITUDE'][0]
                         },
-                        'inspections': {
-                        }
+                        'inspectionMap': {
+                        },
+                        'inspections': []
                     };
                 }
 
-                let inspectionData = existingData['inspections'][res['INSPECTION_ID'][0]];
+                let inspectionData = existingData['inspectionMap'][res['INSPECTION_ID'][0]];
                 if (typeof inspectionData === 'undefined') {
                     inspectionData = {
                         'date': res['INSPECTION_DATE'][0],
@@ -57,16 +59,17 @@ export default () => {
                     });
                 }
 
-                existingData['inspections'][res['INSPECTION_ID'][0]] = inspectionData;
+                existingData['inspectionMap'][res['INSPECTION_ID'][0]] = inspectionData;
                 inspections[res['ESTABLISHMENT_ID'][0]] = existingData;
             });
 
             Object.keys(inspections).forEach(inspection => {
-                let inspectionArray = Object.values(inspections[inspection]['inspections']);
+                let inspectionArray = Object.values(inspections[inspection]['inspectionMap']);
                 inspectionArray.sort((a, b) => (b['date'] > a['date']) ? 1
                     : ((a['date'] > b['date']) ? -1 : 0));
 
                 inspections[inspection]['inspections'] = inspectionArray;
+                inspections[inspection]['inspectionMap'] = {};
 
                 addToStorage(inspection, inspections[inspection]);
             });
