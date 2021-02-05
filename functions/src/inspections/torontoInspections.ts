@@ -83,6 +83,8 @@ const updateTorontoInspections = async (): Promise<boolean> => {
     inspections[inspection]["inspectionMap"] = {};
 
     const location = inspections[inspection];
+    delete location.inspectionMap;
+
     await addToStorage(inspection, location).catch((err) => {
       logger.error(`Error writing to DB: ${err}`);
     });
