@@ -4,12 +4,29 @@ import Location from "../models/location";
 import addToStorage from "../storage/storageService";
 import xmlDownloader from "../utils/xmlDownloader";
 import TorontoInspectionResponse from "./models/torontoInspectionResponse";
+import Inspection from "../models/inspection";
 
 const targetUrl = "http://opendata.toronto.ca/public.health/dinesafe/dinesafe.zip";
 
-const updateTorontoInspections = async (): Promise<boolean> => {
-  logger.info(`Attempting to download file: ${targetUrl}`);
+const compareInspectionDates = (a: Inspection, b: Inspection): number => {
+  if (b["date"] > a["date"]) {
+    return 1;
+  } else if (a["date"] > b["date"]) {
+    return -1;
+  } else {
+    return 0;
+  }
+};
 
+const determineSeverity = (rawSeverity: string): string => {
+  if (rawSeverity.startsWith("NA")) {
+    return rawSeverity.substring(5);
+  }
+
+  return rawSeverity.substring(4);
+};
+
+const updateTorontoInspections = async (): Promise<boolean> => {
   const xml = await xmlDownloader(targetUrl).catch((err) => {
     throw err;
   });
@@ -18,7 +35,6 @@ const updateTorontoInspections = async (): Promise<boolean> => {
     throw err;
   });
 
-  logger.info(`XML string parsed. obj=${xmlObject}`);
   const inspections: Record<string, Location> = {};
   const rows = xmlObject["ROWDATA"]["ROW"];
   rows.forEach((res: TorontoInspectionResponse) => {
@@ -50,16 +66,9 @@ const updateTorontoInspections = async (): Promise<boolean> => {
 
     const infractionDetails = res["INFRACTION_DETAILS"][0];
     if (infractionDetails !== "") {
-      let severity = res["SEVERITY"][0];
-      if (severity.startsWith("NA")) {
-        severity = severity.substring(5);
-      } else {
-        severity = severity.substring(4);
-      }
-
       inspectionData["infractions"].push({
         "details": infractionDetails,
-        "severity": severity,
+        "severity": determineSeverity(res["SEVERITY"][0]),
       });
     }
 
@@ -67,22 +76,17 @@ const updateTorontoInspections = async (): Promise<boolean> => {
     inspections[res["ESTABLISHMENT_ID"][0]] = existingData;
   });
 
-  Object.keys(inspections).forEach(async (inspection) => {
-    const inspectionArray = Object.values(
-        inspections[inspection]["inspectionMap"]
-    );
-
-    inspectionArray.sort((a, b) => (b["date"] > a["date"]) ? 1 :
-                    ((a["date"] > b["date"]) ? -1 : 0));
-
-    inspections[inspection]["inspections"] = inspectionArray;
+  await Promise.all(Object.keys(inspections).map(async (inspection) => {
+    inspections[inspection]["inspections"] = Object
+        .values(inspections[inspection]["inspectionMap"])
+        .sort(compareInspectionDates);
     inspections[inspection]["inspectionMap"] = {};
 
     const location = inspections[inspection];
     await addToStorage(inspection, location).catch((err) => {
       logger.error(`Error writing to DB: ${err}`);
     });
-  });
+  }));
 
   return Promise.resolve(true);
 };
