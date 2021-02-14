@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import updateTorontoInspections from "./inspections/torontoInspections";
+import updateTorontoInspections from "./inspections/toronto/torontoInspections";
 
 export const main = functions.https.onRequest(async (_request, response) => {
   await updateTorontoInspections().catch((err) => {

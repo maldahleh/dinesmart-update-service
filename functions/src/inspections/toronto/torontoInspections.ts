@@ -1,10 +1,10 @@
 import {logger} from "firebase-functions";
 import {parseStringPromise} from "xml2js";
-import Location from "../models/location";
-import addToStorage from "../storage/storageService";
-import xmlDownloader from "../utils/xmlDownloader";
+import Location from "../../models/location";
+import addToStorage from "../../storage/storageService";
+import xmlDownloader from "../../utils/xmlDownloader";
 import TorontoInspectionResponse from "./models/torontoInspectionResponse";
-import Inspection from "../models/inspection";
+import Inspection from "../../models/inspection";
 
 const targetUrl = "http://opendata.toronto.ca/public.health/dinesafe/dinesafe.zip";
 
