@@ -6,6 +6,7 @@ interface DbLocation {
     type: string,
     address: string,
     coords: Coords,
+    inspectionMap?: Record<string, Inspection>,
     inspections: Inspection[]
 }
 
