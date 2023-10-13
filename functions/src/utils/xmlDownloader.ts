@@ -12,20 +12,19 @@ const cleanResponse = (input: Buffer | ArrayBuffer) => {
   return arrayBufferToBuffer(input);
 };
 
-const downloadXml = async (url: string): Promise<string> => {
+export default async (url: string): Promise<string> => {
   const body = await getBuffer(url).catch((err) => {
     throw err;
   });
 
   const cleanedBody = cleanResponse(body);
   const zip = new AdmZip(cleanedBody);
-  const file = zip.getEntries().find((entry: AdmZip.IZipEntry) =>
-    entry.entryName.toLowerCase().endsWith(".xml"));
+  const file = zip
+      .getEntries()
+      .find((entry: AdmZip.IZipEntry) => entry.entryName.toLowerCase().endsWith(".xml"));
   if (file === undefined) {
     throw new Error("No valid xml file found");
   }
 
   return Promise.resolve(zip.readAsText(file, "utf-8"));
 };
-
-export default downloadXml;

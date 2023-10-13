@@ -1,6 +1,5 @@
 import {logger} from "firebase-functions";
 import {parseStringPromise} from "xml2js";
-import DbLocation from "../../storage/models/dbLocation";
 import Location from "../../models/location";
 import addToStorage from "../../storage/storageService";
 import xmlDownloader from "../../utils/xmlDownloader";
@@ -83,7 +82,7 @@ const updateTorontoInspections = async (): Promise<boolean> => {
         .sort(compareInspectionDates);
     inspections[inspection]["inspectionMap"] = {};
 
-    const location: DbLocation = inspections[inspection];
+    const location: Location = inspections[inspection];
     delete location.inspectionMap;
 
     await addToStorage(inspection, location).catch((err) => {
