@@ -1,7 +1,7 @@
 import Coords from "./coords";
 import Inspection from "./inspection";
 
-interface Location {
+export default interface Location {
     name: string,
     type: string,
     address: string,
@@ -9,5 +9,3 @@ interface Location {
     inspectionMap: Record<string, Inspection>,
     inspections: Inspection[]
 }
-
-export default Location;

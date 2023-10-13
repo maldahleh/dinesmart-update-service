@@ -1,9 +1,7 @@
 import Infraction from "./infraction";
 
-interface Inspection {
+export default interface Inspection {
     date: string,
     status: string,
     infractions: Infraction[]
 }
-
-export default Inspection;
