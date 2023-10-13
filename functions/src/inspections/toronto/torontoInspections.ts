@@ -26,7 +26,7 @@ const determineSeverity = (rawSeverity: string): string => {
   return rawSeverity.substring(4);
 };
 
-const updateTorontoInspections = async (): Promise<boolean> => {
+export default async (): Promise<boolean> => {
   const xml = await xmlDownloader(targetUrl).catch((err) => {
     throw err;
   });
@@ -85,12 +85,9 @@ const updateTorontoInspections = async (): Promise<boolean> => {
     const location: Location = inspections[inspection];
     delete location.inspectionMap;
 
-    await addToStorage(inspection, location).catch((err) => {
-      logger.error(`Error writing to DB: ${err}`);
-    });
+    await addToStorage(inspection, location)
+        .catch((err) => logger.error(`Error writing to DB: ${err}`));
   }));
 
   return Promise.resolve(true);
 };
-
-export default updateTorontoInspections;
