@@ -1,4 +1,4 @@
-interface TorontoInspectionResponse {
+export default interface TorontoInspectionResponse {
     "ESTABLISHMENT_ID": string[],
     "ESTABLISHMENT_NAME": string[],
     "ESTABLISHMENTTYPE": string[],
@@ -11,5 +11,3 @@ interface TorontoInspectionResponse {
     "INFRACTION_DETAILS": string[],
     "SEVERITY": string[]
 }
-
-export default TorontoInspectionResponse;

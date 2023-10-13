@@ -1,17 +1,15 @@
 import {logger} from "firebase-functions";
-import {parseStringPromise} from "xml2js";
 import Location from "../../models/location";
 import addToStorage from "../../storage/storageService";
-import xmlDownloader from "../../utils/xmlDownloader";
 import TorontoInspectionResponse from "./models/torontoInspectionResponse";
 import Inspection from "../../models/inspection";
 
-const targetUrl = "http://opendata.toronto.ca/public.health/dinesafe/dinesafe.zip";
+const targetUrl = "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/ea1d6e57-87af-4e23-b722-6c1f5aa18a8d/resource/c573c64d-69b6-4d5b-988a-f3c6aa73f0b0/download/Dinesafe.json";
 
 const compareInspectionDates = (a: Inspection, b: Inspection): number => {
-  if (b["date"] > a["date"]) {
+  if (b.date > a.date) {
     return 1;
-  } else if (a["date"] > b["date"]) {
+  } else if (a.date > b.date) {
     return -1;
   } else {
     return 0;
