@@ -1,4 +1,7 @@
-import Infraction from "./infraction";
+interface Infraction {
+    details: string,
+    severity: string
+}
 
 export default interface Inspection {
     date: string,
