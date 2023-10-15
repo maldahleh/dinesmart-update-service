@@ -72,16 +72,16 @@ export default async (): Promise<boolean> => {
         inspections[inspection["Establishment ID"]] = existingData;
     });
 
-    await Promise.all(Object.keys(inspections).map(async (inspection) => {
-        inspections[inspection].inspections = Object
-            .values(inspections[inspection].inspectionMap)
+    await Promise.all(Object.keys(inspections).map(async (establishmentId) => {
+        inspections[establishmentId].inspections = Object
+            .values(inspections[establishmentId].inspectionMap)
             .sort(compareInspectionDates);
-        inspections[inspection].inspectionMap = {};
+        inspections[establishmentId].inspectionMap = {};
 
-        const location: Location = inspections[inspection];
+        const location: Location = inspections[establishmentId];
         delete location.inspectionMap;
 
-        await addToStorage(inspection, location)
+        await addToStorage(establishmentId, location)
             .catch((err) => logger.error(`Error writing to DB: ${err}`));
     }));
 
