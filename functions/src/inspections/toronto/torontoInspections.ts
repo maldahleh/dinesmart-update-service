@@ -47,18 +47,24 @@ export default async (): Promise<boolean> => {
         };
     }
 
-    const fetchedInspections: [TorontoInspection] = []; // TODO: Download
-    fetchedInspections.forEach((inspection: TorontoInspectionResponse) => {
-        const existingData = getDataForEstablishment(inspection);
-        const inspectionMap = existingData.inspectionMap;
-        let inspectionData = inspectionMap[inspection["Inspection ID"]];
+    const getDataForInspection = (inspection: TorontoInspectionResponse, inspections: Record<string, Inspection>): Inspection => {
+        let inspectionData = inspections[inspection["Inspection ID"]];
         if (typeof inspectionData === "undefined") {
-            inspectionData = {
+            return  {
                 "date": inspection["Inspection Date"],
                 "status": inspection["Establishment Status"],
                 "infractions": [],
             };
         }
+
+        return inspectionData;
+    };
+
+    const fetchedInspections: [TorontoInspection] = []; // TODO: Download
+    fetchedInspections.forEach((inspection: TorontoInspectionResponse) => {
+        const existingData = getDataForEstablishment(inspection);
+        const inspectionMap = existingData.inspectionMap;
+        const inspectionData = getDataForInspection(inspection, inspectionMap);
 
         const infractionDetails = inspection["Infraction Details"];
         if (infractionDetails !== "") {
