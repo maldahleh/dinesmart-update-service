@@ -1,5 +1,6 @@
 .DS_Store
 \.idea
+firebase-debug.log
 
 # Ignore cloud access key
 DineSmart-a5a9a082d13d.json
