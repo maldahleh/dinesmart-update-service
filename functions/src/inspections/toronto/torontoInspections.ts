@@ -1,8 +1,8 @@
 import {logger} from "firebase-functions";
-import Location from "../../models/location";
 import addToStorage from "../../storage/storageService";
 import Inspection from "../../models/inspection";
 import TorontoInspection from "./models/torontoInspection";
+import DbLocation from "../../models/dbLocation";
 
 const targetUrl = "https://ckan0.cf.opendata.inter.prod-toronto.ca/dataset/ea1d6e57-87af-4e23-b722-6c1f5aa18a8d/resource/c573c64d-69b6-4d5b-988a-f3c6aa73f0b0/download/Dinesafe.json";
 
@@ -25,9 +25,11 @@ const determineSeverity = (rawSeverity: string): string => {
 };
 
 export default async (): Promise<boolean> => {
-  const inspections: Record<string, Location> = {};
+  const inspections: Record<string, DbLocation> = {};
 
-  const getDataForEstablishment = (inspection: TorontoInspection): Location => {
+  const getDataForEstablishment = (
+      inspection: TorontoInspection
+  ): DbLocation => {
     const existingData = inspections[inspection["Establishment ID"]];
     if (typeof existingData !== "undefined") {
       return existingData;
@@ -46,15 +48,25 @@ export default async (): Promise<boolean> => {
     };
   };
 
-  // eslint-disable-next-line max-len
-  const getDataForInspection = (inspection: TorontoInspection, inspections: Record<string, Inspection>): Inspection => {
+  const buildEmptyInspection = (inspection: TorontoInspection): Inspection => {
+    return {
+      "date": inspection["Inspection Date"],
+      "status": inspection["Establishment Status"],
+      "infractions": [],
+    };
+  };
+
+  const getDataForInspection = (
+      inspection: TorontoInspection,
+      inspections: Record<string, Inspection> | undefined
+  ): Inspection => {
+    if (!inspections) {
+      return buildEmptyInspection(inspection);
+    }
+
     const inspectionData = inspections[inspection["Inspection ID"]];
     if (typeof inspectionData === "undefined") {
-      return {
-        "date": inspection["Inspection Date"],
-        "status": inspection["Establishment Status"],
-        "infractions": [],
-      };
+      return buildEmptyInspection(inspection);
     }
 
     return inspectionData;
@@ -74,14 +86,16 @@ export default async (): Promise<boolean> => {
       });
     }
 
-    inspectionMap[inspection["Inspection ID"]] = inspectionData;
+    if (inspectionMap) {
+      inspectionMap[inspection["Inspection ID"]] = inspectionData;
+    }
     inspections[inspection["Establishment ID"]] = existingData;
   });
 
   await Promise.all(Object.entries(inspections)
       .map(async ([establishmentId, location]) => {
         location.inspections = Object
-            .values(location.inspectionMap)
+            .values(location.inspectionMap ?? {})
             .sort(compareInspectionDates);
 
         delete location.inspectionMap;
