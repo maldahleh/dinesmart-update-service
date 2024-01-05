@@ -6,7 +6,7 @@ interface Location {
     type: string,
     address: string,
     coords: Coords,
-    inspectionMap: Record<string, Inspection>,
+    inspectionMap?: Record<string, Inspection>,
     inspections: Inspection[]
 }
 
