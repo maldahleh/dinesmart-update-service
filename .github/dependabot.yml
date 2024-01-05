@@ -1,6 +1,8 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/"
+    directory: "/functions"
     schedule:
       interval: "daily"
+    labels:
+      - "dependencies"
