@@ -4,7 +4,11 @@ import {onSchedule} from "firebase-functions/v2/scheduler";
 import {log, debug, error} from "firebase-functions/logger";
 import updateTorontoInspections from "./inspections/toronto/torontoInspections";
 
-exports.updateData = onSchedule("every day 00:00", async () => {
+exports.updateData = onSchedule({
+  schedule: "every day 00:00",
+  memory: "2GiB",
+  timeoutSeconds: 600,
+}, async () => {
   debug("Entered updateData");
   await updateTorontoInspections()
       .catch((err) => error(`Update failed. err=${err}`));
