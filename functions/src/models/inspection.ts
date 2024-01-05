@@ -3,8 +3,10 @@ interface Infraction {
     severity: string
 }
 
-export default interface Inspection {
+interface Inspection {
     date: string,
     status: string,
     infractions: Infraction[]
 }
+
+export default Inspection;

@@ -1,9 +1,11 @@
-import * as functions from "firebase-functions";
+import {onSchedule} from "firebase-functions/v2/scheduler";
+import {logger} from "firebase-functions";
 import updateTorontoInspections from "./inspections/toronto/torontoInspections";
 
-export const main = functions.https.onRequest(async (_request, response) => {
-    await updateTorontoInspections()
-        .catch((err) => response.send(`Toronto: Inspection data update failed. err=${err}`));
+exports.updateData = onSchedule("every day 00:00", async () => {
+  await updateTorontoInspections()
+      // eslint-disable-next-line max-len
+      .catch((err) => logger.error(`Inspection data update failed. err=${err}`));
 
-    response.send("Inspection data updated");
+  logger.log("Updated inspection data");
 });

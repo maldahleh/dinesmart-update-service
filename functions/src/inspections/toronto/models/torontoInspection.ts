@@ -1,4 +1,4 @@
-export default interface TorontoInspection {
+interface TorontoInspection {
     "Establishment ID": number,
     "Establishment Name": string,
     "Establishment Type": string,
@@ -11,3 +11,5 @@ export default interface TorontoInspection {
     "Infraction Details": string,
     "Severity": string
 }
+
+export default TorontoInspection;
