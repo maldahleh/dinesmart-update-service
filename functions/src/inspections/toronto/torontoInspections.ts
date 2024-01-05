@@ -1,4 +1,5 @@
 import {logger} from "firebase-functions";
+import fetch from "node-fetch";
 import addToStorage from "../../storage/storageService";
 import Inspection from "../../models/inspection";
 import TorontoInspection from "./models/torontoInspection";
@@ -70,7 +71,8 @@ export default async (): Promise<boolean> => {
     return inspectionData;
   };
 
-  const fetchedInspections: [TorontoInspection] = []; // TODO: Download
+  const response = await fetch(targetUrl);
+  const fetchedInspections = await response.json() as [TorontoInspection];
   fetchedInspections.forEach((inspection: TorontoInspection) => {
     const existingData = getDataForEstablishment(inspection);
     const inspectionMap = existingData.inspectionMap;

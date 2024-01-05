@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {logger} from "firebase-functions";
 import updateTorontoInspections from "./inspections/toronto/torontoInspections";
