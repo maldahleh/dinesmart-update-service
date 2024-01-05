@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "dinesmart"
-  }
+    "default": "dinesmart-ab0b7"
+  },
+  "targets": {},
+  "etags": {}
 }
