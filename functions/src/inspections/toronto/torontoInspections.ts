@@ -18,6 +18,7 @@ const compareInspectionDates = (a: Inspection, b: Inspection): number => {
 };
 
 const determineSeverity = (rawSeverity: string): string => {
+  logger.debug(`Determining severity for: ${rawSeverity}`);
   if (rawSeverity.startsWith("NA")) {
     return rawSeverity.substring(5);
   }
@@ -29,11 +30,14 @@ export default async (): Promise<boolean> => {
   const inspections: Record<string, Location> = {};
 
   const getDataForEstablishment = (inspection: TorontoInspection): Location => {
+    logger.debug(`Looking for existing data for: ${inspection}`);
     const existingData = inspections[inspection["Establishment ID"]];
     if (typeof existingData !== "undefined") {
+      logger.debug(`Found existing data for ${inspection}: ${existingData}`);
       return existingData;
     }
 
+    logger.debug(`Could not find existing data for ${inspection}`);
     return {
       "name": inspection["Establishment Name"],
       "type": inspection["Establishment Type"],
@@ -73,6 +77,7 @@ export default async (): Promise<boolean> => {
 
   const response = await fetch(targetUrl);
   const fetchedInspections = await response.json() as [TorontoInspection];
+  logger.debug(`Fetched inspections. Size: ${fetchedInspections.length}`);
   fetchedInspections.forEach((inspection: TorontoInspection) => {
     const existingData = getDataForEstablishment(inspection);
     const inspectionMap = existingData.inspectionMap;
@@ -100,6 +105,7 @@ export default async (): Promise<boolean> => {
 
         delete location.inspectionMap;
 
+        logger.debug(`Writing ${establishmentId} to storage. ${location}`);
         await addToStorage(establishmentId, location)
             .catch((err) => logger.error(`Error writing to DB: ${err}`));
       }));
