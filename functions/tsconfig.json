@@ -1,15 +1,22 @@
 {
   "compilerOptions": {
+    "target": "es2022",
     "module": "commonjs",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
-    "sourceMap": true,
+    "lib": ["es2022", "dom", "webworker"],
+    "allowJs": true,
+    "checkJs": true,
+    "outDir": "./dist",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "strict": true,
-    "target": "es2017"
-  },
-  "compileOnSave": true,
-  "include": [
-    "src"
-  ]
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "skipLibCheck": true,
+    "noUnusedLocals": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  }
 }
