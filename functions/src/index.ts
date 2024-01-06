@@ -15,7 +15,7 @@ exports.updateData = onSchedule({
   );
 
   await tracer.startActiveSpan("updateTorontoInspections", async (span) => {
-    updateTorontoInspections()
+    await updateTorontoInspections()
         .catch((err) => error(`Update failed. err=${err}`));
     span.end();
   });
