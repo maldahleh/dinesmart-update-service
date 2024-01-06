@@ -61,7 +61,7 @@ export default async (): Promise<boolean> => {
 
   const getDataForInspection = (
       inspection: TorontoInspection,
-      inspections: Record<string, Inspection> | undefined
+      inspections: Record<string, Inspection> | undefined,
   ): Inspection => {
     if (!inspections) {
       return buildEmptyInspection(inspection);
