@@ -5,8 +5,8 @@
     "lib": ["es2022", "dom", "webworker"],
     "allowJs": true,
     "checkJs": true,
-    "outDir": "./dist",
-    "noEmit": true,
+    "outDir": "./lib",
+    "noEmit": false,
     "resolveJsonModule": true,
     "typeRoots": [
       "./node_modules/@types"
