@@ -7,5 +7,11 @@ inspection data.
 Currently, this project supports the following data providers:
 - City of Toronto
 
+## Technologies
+- Cloud Functions for Firebase
+- Cloud Firestore
+- Node.js
+- TypeScript
+
 ## Architecture
 ![architecture](./images/architecture.png)
