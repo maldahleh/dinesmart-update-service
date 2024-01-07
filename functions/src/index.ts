@@ -2,7 +2,6 @@
 import {onSchedule} from "firebase-functions/v2/scheduler";
 // eslint-disable-next-line import/no-unresolved
 import {log, error} from "firebase-functions/logger";
-import * as opentelemetry from "@opentelemetry/api";
 import updateTorontoInspections from "./inspections/toronto/torontoInspections";
 
 exports.updateData = onSchedule({
@@ -10,15 +9,8 @@ exports.updateData = onSchedule({
   memory: "2GiB",
   timeoutSeconds: 600,
 }, async () => {
-  const tracer = opentelemetry.trace.getTracer(
-      "update-data",
-  );
-
-  await tracer.startActiveSpan("updateTorontoInspections", async (span) => {
-    await updateTorontoInspections()
-        .catch((err) => error(`Update failed. err=${err}`));
-    span.end();
-  });
+  await updateTorontoInspections()
+      .catch((err) => error(`Update failed. err=${err}`));
 
   log("Updated inspection data");
 });
