@@ -4,5 +4,3 @@ updates:
     directory: "/functions"
     schedule:
       interval: "daily"
-    labels:
-      - "dependencies"
