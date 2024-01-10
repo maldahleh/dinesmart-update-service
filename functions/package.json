@@ -1,5 +1,6 @@
 {
   "name": "functions",
+  "repository": "https://github.com/maldahleh/dinesmart-update-service",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
