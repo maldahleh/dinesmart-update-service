@@ -15,3 +15,7 @@ Currently, this project supports the following data providers:
 
 ## Architecture
 ![architecture](./images/architecture.png)
+
+## Related Projects
+- [dinesmart](https://github.com/maldahleh/dinesmart): iOS Client
+- [dinesmart-retrieval-service](https://github.com/maldahleh/dinesmart-retrieval-service): Express API that exposes the contents of the Cloud Firestore database
